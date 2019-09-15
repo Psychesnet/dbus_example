@@ -18,7 +18,7 @@ public:
 private:
     static void *start_listen_service(void *args);
     int listen_loop();
-    void reply_to_method_call(DBusMessage * msg);
+    void parse_and_reply(DBusMessage * msg);
 
 protected:
     pthread_t pid;

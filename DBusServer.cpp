@@ -58,8 +58,8 @@ int DBusServer::listen_loop()
         // dbus_bus_add_match(conn, "interface='signal',interface='test.signal.Type'", &err);
         // dbus_connection_flush(conn);
         // if(dbus_error_is_set(&err)){
-            // fprintf(stderr, "Match Error %s\n", err.message);
-            // break;
+        // fprintf(stderr, "Match Error %s\n", err.message);
+        // break;
         // }
         while(!exit_flag){
             dbus_connection_read_write(conn, 0);
@@ -83,7 +83,7 @@ int DBusServer::listen_loop()
                 //我们这里面先比较了接口名字和方法名字，实际上应当现比较路径
                 if(strcmp(dbus_message_get_path(msg), object_name.c_str()) == 0) {
                     // TODO, need think about it
-                    reply_to_method_call(msg);
+                    parse_and_reply(msg);
                 }
             }
             dbus_message_unref(msg);
@@ -93,37 +93,40 @@ int DBusServer::listen_loop()
     return ret;
 }
 
-void DBusServer::reply_to_method_call(DBusMessage * msg)
+void DBusServer::parse_and_reply(DBusMessage *msg)
 {
-    DBusMessage * reply;
-    DBusMessageIter arg;
+    int current_type;
+    DBusMessage *reply;
+    DBusMessageIter input, output;
     char * param = NULL;
     dbus_uint32_t ok = DBUS_REPLY_OK;
     dbus_uint32_t serial = 0;
-
-    //从msg中读取参数，这个在上一次学习中学过
-    if(!dbus_message_iter_init(msg, &arg)) {
-        printf("Message has no args\n");
-    } else if(dbus_message_iter_get_arg_type(&arg) != DBUS_TYPE_STRING) {
-        printf("Arg is not string!\n");
+    if (dbus_message_iter_init(msg, &input)) {
+        reply = dbus_message_new_method_return(msg);
+        dbus_message_iter_init_append(reply, &output);
+        while ((current_type = dbus_message_iter_get_arg_type(&input))
+                != DBUS_TYPE_INVALID) {
+            switch (current_type) {
+                case DBUS_TYPE_STRING:
+                    dbus_message_iter_get_basic(&input, &param);
+                    fprintf(stderr, "Get \"%s\"\n", param);
+                    if(!dbus_message_iter_append_basic(&output, DBUS_TYPE_UINT32, &ok)) {
+                        printf("Out of Memory!\n");
+                    }
+                    break;
+                default:
+                    fprintf(stderr, "type not support(%d)\n", current_type);
+                    break;
+            }
+            dbus_message_iter_next(&input);
+        }
+        if(!dbus_connection_send(conn, reply, &serial)){
+            printf("Out of Memory\n");
+        }
+        dbus_connection_flush(conn);
+        dbus_message_unref(reply);
     } else {
-        dbus_message_iter_get_basic(&arg, &param);
+        fprintf(stderr, "message has no args\n");
     }
-    if(param == NULL) return;
-    fprintf(stderr, "Get \"%s\"\n", param);
-
-    //创建返回消息reply
-    reply = dbus_message_new_method_return(msg);
-    dbus_message_iter_init_append(reply, &arg);
-    if(!dbus_message_iter_append_basic(&arg, DBUS_TYPE_UINT32, &ok)) {
-        printf("Out of Memory!\n");
-        exit(1);
-    }
-    //发送返回消息
-    if(!dbus_connection_send(conn, reply, &serial)){
-        printf("Out of Memory\n");
-        exit(1);
-    }
-    dbus_connection_flush(conn);
-    dbus_message_unref(reply);
 }
+
