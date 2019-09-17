@@ -3,7 +3,7 @@ project(DBusClient)
 
 # include path
 include_directories(/usr/local/include/dbus-1.0)
-include_directories(/usr/local/Cellar/dbus/1.12.16/lib/dbus-1.0/include)
+include_directories(/usr/local/Cellar/dbus/1.12.12/lib/dbus-1.0/include)
 
 # find extra lib as variable
 find_library(USR_LOCAL_LIBRARY

@@ -4,7 +4,7 @@ int main(int argc, char *argv[])
 {
     DBusServer server;
     do {
-        if (server.init("server") != 0) {
+        if (server.init(DAEMON_PRAWN) != 0) {
             fprintf(stderr, "init server failed\n");
             break;
         }

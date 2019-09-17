@@ -78,13 +78,14 @@ int DBusServer::listen_loop()
                     dbus_message_iter_get_basic(&arg,&sigvalue);
                     printf("Got Singal with value : %s\n",sigvalue);
                 }
-            }else if(dbus_message_is_method_call(msg,
-                        interface_name.c_str(), HANDLE_METHOD)){
-                //我们这里面先比较了接口名字和方法名字，实际上应当现比较路径
-                if(strcmp(dbus_message_get_path(msg), object_name.c_str()) == 0) {
-                    // TODO, need think about it
-                    parse_and_reply(msg);
-                }
+            }else {
+                if(dbus_message_is_method_call(msg,
+                            interface_name.c_str(), get_support_method(DBUS_INDEX_METHOD))){
+                    if(strcmp(dbus_message_get_path(msg), object_name.c_str()) == 0) {
+                        // TODO, need think about it
+                        parse_and_reply(msg);
+                    }
+                } // TODO, need to handle others
             }
             dbus_message_unref(msg);
         }
