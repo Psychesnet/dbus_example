@@ -10,7 +10,7 @@ public:
     explicit DBusServer();
     virtual ~DBusServer();
 
-    int deinit() override;
+    virtual int deinit();
 
     virtual int start_listen_thread();
     virtual int stop_listen_thread();
