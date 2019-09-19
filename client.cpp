@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "init dameon client failed\n");
                 break;
             }
-            if (client.create_transation(DAEMON_PRAWN, DBUS_INDEX_METHOD) != 0) {
+            if (client.create_transation(DAEMON_PRAWN, DBUS_TYPE_METHOD) != 0) {
                 fprintf(stderr, "create transation to server failed\n");
                 break;
             }
@@ -19,11 +19,27 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "append string failed\n");
                 break;
             }
-            if (client.append_string_transation("Good day!!") != 0) {
+            if (client.append_string_transation("Good day, method!!") != 0) {
                 fprintf(stderr, "append string failed\n");
                 break;
             }
-            if ((ret = client.commit_transation()) != 0) {
+            if ((ret = client.commit_transation_with_reply()) != 0) {
+                fprintf(stderr, "commit transation failed\n");
+                break;
+            }
+            if (client.create_transation(DAEMON_SHEEP, DBUS_TYPE_SIGNAL) != 0) {
+                fprintf(stderr, "create transation to server failed\n");
+                break;
+            }
+            if (client.append_string_transation("Hello, I'm a sheep.") != 0) {
+                fprintf(stderr, "append string failed\n");
+                break;
+            }
+            if (client.append_string_transation("Good day, signal!!") != 0) {
+                fprintf(stderr, "append string failed\n");
+                break;
+            }
+            if ((ret = client.commit_transation_without_reply()) != 0) {
                 fprintf(stderr, "commit transation failed\n");
                 break;
             }
@@ -34,7 +50,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "init dameon client failed\n");
                 break;
             }
-            if (client.create_transation(DAEMON_PRAWN, DBUS_INDEX_METHOD) != 0) {
+            if (client.create_transation(DAEMON_PRAWN, DBUS_TYPE_METHOD) != 0) {
                 fprintf(stderr, "create transation to server failed\n");
                 break;
             }
@@ -42,11 +58,27 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "append string failed\n");
                 break;
             }
-            if (client.append_string_transation("Good day!!") != 0) {
+            if (client.append_string_transation("Good day, method!!") != 0) {
                 fprintf(stderr, "append string failed\n");
                 break;
             }
-            if ((ret = client.commit_transation()) != 0) {
+            if ((ret = client.commit_transation_with_reply()) != 0) {
+                fprintf(stderr, "commit transation failed\n");
+                break;
+            }
+            if (client.create_transation(DAEMON_CROCODILE, DBUS_TYPE_SIGNAL) != 0) {
+                fprintf(stderr, "create transation to server failed\n");
+                break;
+            }
+            if (client.append_string_transation("Hello, I'm a crocodile.") != 0) {
+                fprintf(stderr, "append string failed\n");
+                break;
+            }
+            if (client.append_string_transation("Good day, signal!!") != 0) {
+                fprintf(stderr, "append string failed\n");
+                break;
+            }
+            if ((ret = client.commit_transation_without_reply()) != 0) {
                 fprintf(stderr, "commit transation failed\n");
                 break;
             }

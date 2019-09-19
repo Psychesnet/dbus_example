@@ -49,18 +49,29 @@ int DBusServer::listen_loop()
     object_name = "/" + std::string(bus_name) + "/object";
     std::replace(object_name.begin(), object_name.end(), '.', '/');
     interface_name = std::string(bus_name) + ".interface";
+    std::string signal_bus_name = std::string(BASIC_SIGNAL_NAME);
+    std::string signal_interface_name = signal_bus_name + ".interface";
+    std::string signal_filiter = std::string("type='signal',interface='") +
+        signal_interface_name + "'";
+    std::string signal_object_name = "/" + signal_bus_name + "/object";
+    std::replace(signal_object_name.begin(), signal_object_name.end(), '.', '/');
     fprintf(stderr, "start listen service\n");
     fprintf(stderr, "host bus name: %s\n", bus_name.c_str());
     fprintf(stderr, "object name: %s\n", object_name.c_str());
     fprintf(stderr, "interface_name: %s\n", interface_name.c_str());
+    fprintf(stderr, "signal bus name: %s\n", BASIC_SIGNAL_NAME);
+    fprintf(stderr, "signal interface name %s\n", signal_interface_name.c_str());
+    fprintf(stderr, "signal filiter: %s\n", signal_filiter.c_str());
+    fprintf(stderr, "signal object name: %s\n", signal_object_name.c_str());
     do {
-        //要求监听某个singal：来自接口test.signal.Type的信号
-        // dbus_bus_add_match(conn, "interface='signal',interface='test.signal.Type'", &err);
-        // dbus_connection_flush(conn);
-        // if(dbus_error_is_set(&err)){
-        // fprintf(stderr, "Match Error %s\n", err.message);
-        // break;
-        // }
+        // listen signal at interface camera.signal.SERVICE_NAME
+        dbus_bus_add_match(conn, signal_filiter.c_str(), &err);
+        dbus_connection_flush(conn);
+        if(dbus_error_is_set(&err)){
+            fprintf(stderr, "Set signal filiter(%s) failed, %s\n",
+                    signal_filiter.c_str(), err.message);
+            break;
+        }
         while(!exit_flag){
             dbus_connection_read_write(conn, 0);
             msg = dbus_connection_pop_message (conn);
@@ -69,18 +80,14 @@ int DBusServer::listen_loop()
                 continue;
             }
             //TODO, how to handle signal
-            if(dbus_message_is_signal(msg,"test.signal.Type","Test")){
-                if(!dbus_message_iter_init(msg,&arg)) {
-                    fprintf(stderr,"Message Has no Param");
-                } else if(dbus_message_iter_get_arg_type(&arg) != DBUS_TYPE_STRING) {
-                    fprintf(stderr, "Param is not string");
-                } else {
-                    dbus_message_iter_get_basic(&arg,&sigvalue);
-                    printf("Got Singal with value : %s\n",sigvalue);
-                }
+            if(dbus_message_is_signal(msg, signal_interface_name.c_str(),
+                        get_support_type(DBUS_TYPE_SIGNAL))){
+                    if(strcmp(dbus_message_get_path(msg), signal_object_name.c_str()) == 0) {
+                        parse_and_reply(msg);
+                    }
             }else {
                 if(dbus_message_is_method_call(msg,
-                            interface_name.c_str(), get_support_method(DBUS_INDEX_METHOD))){
+                            interface_name.c_str(), get_support_type(DBUS_TYPE_METHOD))){
                     if(strcmp(dbus_message_get_path(msg), object_name.c_str()) == 0) {
                         // TODO, need think about it
                         parse_and_reply(msg);

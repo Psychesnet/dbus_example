@@ -2,7 +2,8 @@
 #define DAEMONDEFINE_H
 
 // global part
-#define BASIC_BUS_NAME "camera.dbus."
+#define BASIC_BUS_NAME      "camera.dbus."
+#define BASIC_SIGNAL_NAME   BASIC_BUS_NAME"signal"
 
 // daemon part
 #define DAEMON_PRAWN        "prawn"
@@ -19,15 +20,14 @@ enum {
     DBUS_REPLY_WRONG_TYPE = 2,
 };
 
-/*! \enum DBUS_METHOD_KEY
+/*! \enum DBUS_TYPE_KEY
  *
  *  define the key for dbus service
  */
-enum DBUS_METHOD_INDEX {
-    DBUS_INDEX_METHOD = 0,
-    DBUS_INDEX_SIGNAL,
-    DBUS_INDEX_ASK_DAEMON,
-    DBUS_INDEX_NUMS,
+enum DBUS_TYPE_INDEX {
+    DBUS_TYPE_METHOD = 0,
+    DBUS_TYPE_SIGNAL,
+    DBUS_TYPE_NUMS,
 };
 
 #endif /* DAEMONDEFINE_H */
