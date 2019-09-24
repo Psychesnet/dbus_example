@@ -79,20 +79,16 @@ int DBusServer::listen_loop()
                 sleep(1);
                 continue;
             }
-            //TODO, how to handle signal
             if(dbus_message_is_signal(msg, signal_interface_name.c_str(),
                         get_support_type(DBUS_TYPE_SIGNAL))){
-                    if(strcmp(dbus_message_get_path(msg), signal_object_name.c_str()) == 0) {
-                        parse_and_reply(msg);
-                    }
-            }else {
-                if(dbus_message_is_method_call(msg,
-                            interface_name.c_str(), get_support_type(DBUS_TYPE_METHOD))){
-                    if(strcmp(dbus_message_get_path(msg), object_name.c_str()) == 0) {
-                        // TODO, need think about it
-                        parse_and_reply(msg);
-                    }
-                } // TODO, need to handle others
+                if(strcmp(dbus_message_get_path(msg), signal_object_name.c_str()) == 0) {
+                    parse_and_reply(msg);
+                }
+            }else if(dbus_message_is_method_call(msg, interface_name.c_str(),
+                        get_support_type(DBUS_TYPE_METHOD))){
+                if(strcmp(dbus_message_get_path(msg), object_name.c_str()) == 0) {
+                    parse_and_reply(msg);
+                }
             }
             dbus_message_unref(msg);
         }
@@ -106,7 +102,6 @@ void DBusServer::parse_and_reply(DBusMessage *msg)
     int current_type;
     DBusMessage *reply;
     DBusMessageIter input, output;
-    char * param = NULL;
     dbus_uint32_t ok = DBUS_REPLY_OK;
     dbus_uint32_t serial = 0;
     if (dbus_message_iter_init(msg, &input)) {
@@ -116,20 +111,38 @@ void DBusServer::parse_and_reply(DBusMessage *msg)
                 != DBUS_TYPE_INVALID) {
             switch (current_type) {
                 case DBUS_TYPE_STRING:
-                    dbus_message_iter_get_basic(&input, &param);
-                    fprintf(stderr, "Get \"%s\"\n", param);
-                    if(!dbus_message_iter_append_basic(&output, DBUS_TYPE_UINT32, &ok)) {
-                        printf("Out of Memory!\n");
+                    {
+                        char * param = NULL;
+                        dbus_message_iter_get_basic(&input, &param);
+                        ok = handle_string(param);
+                    }
+                    break;
+                case DBUS_TYPE_UINT32:
+                    {
+                        uint32_t param = 0;
+                        dbus_message_iter_get_basic(&input, &param);
+                        ok = handle_uint32(param);
+                    }
+                    break;
+                case DBUS_TYPE_UINT64:
+                    {
+                        uint64_t param = 0;
+                        dbus_message_iter_get_basic(&input, &param);
+                        ok = handle_uint64(param);
                     }
                     break;
                 default:
                     fprintf(stderr, "type not support(%d)\n", current_type);
+                    ok = DBUS_REPLY_WRONG_TYPE;
                     break;
+            }
+            if(!dbus_message_iter_append_basic(&output, DBUS_TYPE_UINT32, &ok)) {
+                fprintf(stderr, "prepare reponse failed\n");
             }
             dbus_message_iter_next(&input);
         }
         if(!dbus_connection_send(conn, reply, &serial)){
-            printf("Out of Memory\n");
+            fprintf(stderr, "send response failed\n");
         }
         dbus_connection_flush(conn);
         dbus_message_unref(reply);
@@ -138,3 +151,64 @@ void DBusServer::parse_and_reply(DBusMessage *msg)
     }
 }
 
+void DBusServer::parse_and_noreply(DBusMessage *msg)
+{
+    int current_type;
+    DBusMessageIter input;
+    if (dbus_message_iter_init(msg, &input)) {
+        while ((current_type = dbus_message_iter_get_arg_type(&input))
+                != DBUS_TYPE_INVALID) {
+            switch (current_type) {
+                case DBUS_TYPE_STRING:
+                    {
+                        char * param = NULL;
+                        dbus_message_iter_get_basic(&input, &param);
+                        handle_string(param);
+                    }
+                    break;
+                case DBUS_TYPE_UINT32:
+                    {
+                        uint32_t param = 0;
+                        dbus_message_iter_get_basic(&input, &param);
+                        handle_uint32(param);
+                    }
+                    break;
+                case DBUS_TYPE_UINT64:
+                    {
+                        uint64_t param = 0;
+                        dbus_message_iter_get_basic(&input, &param);
+                        handle_uint64(param);
+                    }
+                    break;
+                default:
+                    fprintf(stderr, "type not support(%d)\n", current_type);
+                    break;
+            }
+            dbus_message_iter_next(&input);
+        }
+        dbus_connection_flush(conn);
+    } else {
+        fprintf(stderr, "message has no args\n");
+    }
+}
+
+uint32_t DBusServer::handle_string(const char * param)
+{
+    uint32_t ret = DBUS_REPLY_OK;
+    fprintf(stderr, "%s %s\n", __func__, param);
+    return ret;
+}
+
+uint32_t DBusServer::handle_uint32(const uint32_t param)
+{
+    uint32_t ret = DBUS_REPLY_OK;
+    fprintf(stderr, "%s %u\n", __func__, param);
+    return ret;
+}
+
+uint32_t DBusServer::handle_uint64(const uint64_t param)
+{
+    uint32_t ret = DBUS_REPLY_OK;
+    fprintf(stderr, "%s %llu\n", __func__, param);
+    return ret;
+}

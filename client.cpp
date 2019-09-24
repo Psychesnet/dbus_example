@@ -19,6 +19,14 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "append string failed\n");
                 break;
             }
+            if (client.append_integer32_transation(100) != 0) {
+                fprintf(stderr, "append int32 failed\n");
+                break;
+            }
+            if (client.append_integer64_transation(2^64-1) != 0) {
+                fprintf(stderr, "append int64 failed\n");
+                break;
+            }
             if (client.append_string_transation("Good day, method!!") != 0) {
                 fprintf(stderr, "append string failed\n");
                 break;
@@ -33,6 +41,14 @@ int main(int argc, char *argv[])
             }
             if (client.append_string_transation("Hello, I'm a sheep.") != 0) {
                 fprintf(stderr, "append string failed\n");
+                break;
+            }
+            if (client.append_integer32_transation(132) != 0) {
+                fprintf(stderr, "append int32 failed\n");
+                break;
+            }
+            if (client.append_integer64_transation(2^64-1) != 0) {
+                fprintf(stderr, "append int64 failed\n");
                 break;
             }
             if (client.append_string_transation("Good day, signal!!") != 0) {
