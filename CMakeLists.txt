@@ -2,8 +2,20 @@ cmake_minimum_required(VERSION 3.11)
 include(FindPkgConfig)
 project(DBusClient)
 
-set(TARS client server dbus-example)
-set(SRCS DBusClient.cpp DBusServer.cpp)
+set(TARS
+    client
+    server
+    dbus-example
+)
+set(SRCS
+    DBusClient.cpp
+    DBusServer.cpp
+    LoggerInterface.cpp
+    LoggerStdout.cpp
+    LoggerStderr.cpp
+    LoggerSyslog.cpp
+    Logger.cpp
+)
 set(DEP_LIBS OpenSSL dbus-1)
 set(EXTRA_PKG_PATHS "/usr/lib/pkgconfig" "/usr/local/Cellar/dbus/1.12.12/lib/pkgconfig")
 

@@ -8,8 +8,8 @@
 #include <unistd.h>
 #include <algorithm>
 #include <string>
-
 #include "DaemonService.h"
+#include "Logger.h"
 
 class DBusClient
 {
