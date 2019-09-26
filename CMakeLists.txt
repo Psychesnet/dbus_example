@@ -15,9 +15,18 @@ set(SRCS
     LoggerStderr.cpp
     LoggerSyslog.cpp
     Logger.cpp
+    Backtrace.cpp
 )
 set(DEP_LIBS OpenSSL dbus-1)
 set(EXTRA_PKG_PATHS "/usr/lib/pkgconfig" "/usr/local/Cellar/dbus/1.12.12/lib/pkgconfig")
+
+# short __FILE__ path
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-builtin-macro-redefined -D'__FILE__=\"$(subst $(realpath ${CMAKE_SOURCE_DIR})/,,$(abspath $<))\"'")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-builtin-macro-redefined -D'__FILE__=\"$(subst $(realpath ${CMAKE_SOURCE_DIR})/,,$(abspath $<))\"'")
+
+# select os parameters
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D'${CMAKE_HOST_SYSTEM_NAME}'")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D'${CMAKE_HOST_SYSTEM_NAME}'")
 
 find_package(PkgConfig REQUIRED)
 if(PKG_CONFIG_FOUND)

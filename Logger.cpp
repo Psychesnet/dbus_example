@@ -4,18 +4,22 @@ static LoggerInterface *log = NULL;
 int logger_init(const int type)
 {
     int ret = -1;
-    switch (type) {
-        case LOGGER_TYPE_STDOUT:
-            log = new LoggerStdout();
-            break;
-        case LOGGER_TYPE_STDERR:
-            log = new LoggerStderr();
-            break;
-        case LOGGER_TYPE_SYSLOG:
-            log = new LoggerSyslog();
-            break;
-        default:
-           break;
+    if (log) {
+        log_warning("Already init logger feature");
+    } else {
+        switch (type) {
+            case LOGGER_TYPE_STDOUT:
+                log = new LoggerStdout();
+                break;
+            case LOGGER_TYPE_STDERR:
+                log = new LoggerStderr();
+                break;
+            case LOGGER_TYPE_SYSLOG:
+                log = new LoggerSyslog();
+                break;
+            default:
+                break;
+        }
     }
     return ret;
 }

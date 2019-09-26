@@ -235,7 +235,6 @@ void listen()
    DBusConnection* conn;
    DBusError err;
    int ret;
-   char* param;
 
    printf("Listening for method calls\n");
 

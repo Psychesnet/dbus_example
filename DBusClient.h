@@ -10,6 +10,7 @@
 #include <string>
 #include "DaemonService.h"
 #include "Logger.h"
+#include "Backtrace.h"
 
 class DBusClient
 {
@@ -36,6 +37,7 @@ public:
 protected:
     bool exit_flag;
     bool already_init;
+    Backtrace trace;
     DBusError err;
     DBusConnection *conn;
     std::string service_name;
