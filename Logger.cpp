@@ -5,16 +5,19 @@ int logger_init(const int type)
 {
     int ret = -1;
     if (log) {
-        log_warning("Already init logger feature");
+        log_debug("Already init logger feature");
     } else {
         switch (type) {
             case LOGGER_TYPE_STDOUT:
+                log_info("debug via stdout");
                 log = new LoggerStdout();
                 break;
             case LOGGER_TYPE_STDERR:
+                log_info("debug via stderr");
                 log = new LoggerStderr();
                 break;
             case LOGGER_TYPE_SYSLOG:
+                log_info("debug via syslog");
                 log = new LoggerSyslog();
                 break;
             default:

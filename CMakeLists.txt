@@ -17,7 +17,7 @@ set(SRCS
     Logger.cpp
     Backtrace.cpp
 )
-set(DEP_LIBS OpenSSL dbus-1)
+set(DEP_LIBS dbus-1)
 set(EXTRA_PKG_PATHS "/usr/lib/pkgconfig" "/usr/local/Cellar/dbus/1.12.12/lib/pkgconfig")
 
 # short __FILE__ path
